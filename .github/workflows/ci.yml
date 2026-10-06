@@ -1,4 +1,3 @@
-cat > .github/workflows/ci.yml <<'EOF'
 name: Go CI
 
 "on":
@@ -46,11 +45,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: true
           tags: |
             ghcr.io/syslians/go-k8s-demo:${{ github.sha }}
             ghcr.io/syslians/go-k8s-demo:latest
-EOF
