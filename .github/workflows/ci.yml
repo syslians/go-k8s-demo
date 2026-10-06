@@ -1,10 +1,10 @@
-cat > .github/workflows/ci.yml <<'EOF'
 name: Go CI
 
-on:
+"on":
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
@@ -30,4 +30,3 @@ jobs:
 
       - name: Build
         run: go build ./cmd/server
-EOF
