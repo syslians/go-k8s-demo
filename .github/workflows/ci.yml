@@ -1,5 +1,3 @@
-cd ~/projects/go-k8s-demo
-
 cat > .github/workflows/ci.yml <<'EOF'
 name: Go CI
 
