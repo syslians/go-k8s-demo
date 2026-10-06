@@ -1,3 +1,6 @@
+cd ~/projects/go-k8s-demo
+
+cat > .github/workflows/ci.yml <<'EOF'
 name: Go CI
 
 "on":
@@ -11,9 +14,14 @@ name: Go CI
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: syslians/go-k8s-demo
 
 jobs:
-  test:
+  test-build-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,5 +36,23 @@ jobs:
       - name: Test
         run: go test ./...
 
-      - name: Build
+      - name: Build Go
         run: go build ./cmd/server
+
+      - name: Login to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: |
+            ghcr.io/syslians/go-k8s-demo:${{ github.sha }}
+            ghcr.io/syslians/go-k8s-demo:latest
+EOF
